@@ -1,0 +1,15 @@
+{
+  "name": "photo-editorial-studio",
+  "version": "1.0.0",
+  "description": "A local photo and abstract editorial poster studio.",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check lib/editorial-image.js && node --check lib/load-env.js && node --check lib/vision.js && node --check public/app.js && node --check public/photo-process.js && node --check public/photo-worker.js && node --check public/photo-editorial.js && node --check public/image-format.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

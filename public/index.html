@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="保留原照片，以同源抽象和文字记录日常的编辑海报工具" />
+  <title>场景海报实验室 · 摄影与抽象</title><link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<main class="shell">
+  <header class="masthead"><div><p class="eyebrow">PHOTO STUDY / AN EDITORIAL COMPANION</p><h1>照片之外，留一点余韵。</h1><p class="dek">一张真实的照片，一组从中提炼的形状。把距离、方向和颜色，留在干净的纸面上。</p></div><div class="status-pill" id="apiStatus" role="status" aria-live="polite">正在准备…</div></header>
+  <section class="workspace">
+    <aside class="controls panel">
+      <div class="section-label">01 / 输入照片</div>
+      <label class="dropzone" id="dropzone" for="fileInput"><input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" /><span class="drop-icon">＋</span><strong id="fileLabel">选择一张图片</strong><small>JPG、PNG、WebP · 最多 30 MB。选择照片仅本地读取，点击 AI 生成时才发送压缩图。</small></label>
+      <div class="preview-wrap hidden" id="previewWrap"><img id="previewImage" alt="待处理照片" /><button class="text-button" id="clearButton" type="button">移除图片</button></div>
+      <div class="section-label section-spaced">02 / 编辑画面</div>
+      <div class="field"><label for="mode">创作模式</label><select id="mode"><option value="editorial">摄影＋抽象编辑</option><option value="poster">保形专色海报</option></select></div>
+      <div id="editorialControls">
+        <p class="mode-note">上方保留照片，下方留给抽象。图形来自照片中的关系，标题在本地排版。</p>
+        <div class="field"><label for="layout">版式</label><select id="layout"><option value="auto">随照片选择</option><option value="wide">横向舒展</option><option value="vertical">纵向凝练</option><option value="balanced">居中平衡</option><option value="sparse">小景留白</option></select></div>
+        <div class="field"><div class="field-head"><label for="panelSize">面板高度</label><output id="panelSizeValue">60</output></div><input id="panelSize" type="range" min="35" max="90" value="60" /></div>
+        <div class="field"><div class="field-head"><label for="motifScale">图形尺度</label><output id="motifScaleValue">85</output></div><input id="motifScale" type="range" min="45" max="115" value="85" /></div>
+        <div class="field"><label for="editorialTitle">标题 · 生成后可修改</label><input id="editorialTitle" type="text" maxlength="70" placeholder="从照片中写一句话" /></div>
+        <div class="field"><label for="editorialSubtitle">副标题 · 可留空</label><input id="editorialSubtitle" type="text" maxlength="90" placeholder="留白也很好" /></div>
+      </div>
+      <div id="posterControls" class="hidden">
+        <div class="field"><label for="colors">颜色数量</label><select id="colors"><option value="6">6 色 · 更简洁</option><option value="8">8 色 · 均衡</option><option value="12" selected>12 色 · 保留更多层次</option></select></div>
+        <div class="field"><div class="field-head"><label for="strength">纹理简化</label><output id="strengthValue">35%</output></div><input id="strength" type="range" min="0" max="100" value="35" /><small class="privacy-note">人物、宠物建议先用 8–12 色和较低简化程度。</small></div>
+        <div class="field"><label for="colorMode">画面配色</label><select id="colorMode"><option value="source">原图提色 · 保留色相关系</option><option value="guided">AI 建议 · 轻度调整近似颜色</option></select></div>
+        <div class="field"><div class="field-head"><label for="texture">印刷颗粒</label><output id="textureValue">12%</output></div><input id="texture" type="range" min="0" max="60" value="12" /></div>
+        <div class="field"><label for="seed">纹理种子</label><input id="seed" type="number" value="20261102" min="0" step="1" /></div>
+      </div>
+      <div class="field"><label for="paper">底色</label><select id="paper"><option value="warm">温暖象牙白</option><option value="clean">自然白</option><option value="cool">淡灰绿</option></select></div>
+      <button class="primary-button" id="generateButton" type="button" disabled>AI 生成摄影＋抽象</button>
+      <button class="secondary-button ai-button hidden" id="aiButton" type="button" disabled>AI 配色与文案</button>
+      <button class="text-button hidden" id="retryMotifButton" type="button" disabled>重新生成抽象图形（调用 AI）</button>
+      <p class="privacy-note" id="connectionInfo" role="status">正在检查 AI 连接…</p>
+      <p class="privacy-note" id="privacyInfo">AI 生成会将压缩照片发送至视觉模型及图片生成服务，并通过临时图片链接供生成服务读取；可能计入账户用量。版式、底色与文字调整均在本地完成，不重复调用 AI。结果仅在当前页面缓存。</p>
+    </aside>
+    <section class="result panel">
+      <div class="result-head"><div><div class="section-label">03 / 输出海报</div><h2 id="resultHeading">真实的片刻，抽象的回声。</h2></div><button class="secondary-button" id="downloadButton" type="button" disabled>下载 PNG</button></div>
+      <ol class="progress-steps hidden" id="progressSteps" aria-label="生成进度"><li id="stepPlan">观察照片</li><li id="stepMotif">绘制抽象</li><li id="stepCompose">本地排版</li></ol>
+      <div class="canvas-stage" id="canvasStage"><div class="empty-state" id="emptyState"><div class="empty-mark">✦</div><p id="emptyTitle">从一张照片开始。</p><small id="emptyDescription">保留原片，提炼少数重要关系。用有限的形状和颜色，为日常留一点空白。</small></div><canvas id="resultCanvas" class="hidden" aria-label="最终海报"></canvas></div>
+      <div class="result-meta" id="resultMeta" aria-live="polite">尚未生成</div>
+      <details id="sceneDetails" class="scene-details hidden"><summary>这张照片留下了哪些关系</summary><p id="sceneText"></p><ul id="sceneFacts"></ul><p class="privacy-note">这些是 AI 对照片的理解，可对照原图检查；图形不会替换上方摄影区域。</p></details>
+      <div class="comparison hidden" id="comparison"><figure><img id="originalCompare" alt="原照片对照" /><figcaption>原照片 · 原始空间与姿态</figcaption></figure><figure><canvas id="detailCanvas" aria-label="图形细节对照"></canvas><figcaption id="detailCaption">抽象图形 · 检查关系与颜色</figcaption></figure></div>
+    </section>
+  </section>
+  <footer><span>Scene Poster Lab / Editorial Edition</span><span>原照片 · 同源抽象 · 本地排版</span></footer>
+</main><script src="/app.js" type="module"></script>
+</body>
+</html>
